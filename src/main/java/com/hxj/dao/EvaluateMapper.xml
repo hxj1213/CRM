@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hxj.dao.EvaluateMapper" >
+
+  <sql id="Base_Column_List" >
+    eid, cusId, cId, attitude, exterior, trim, space
+  </sql>
+
+  <insert id="insert" parameterType="Evaluate" >
+    insert into t_evaluate
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="eid != null" >
+        eid,
+      </if>
+      <if test="cusid != null" >
+        cusId,
+      </if>
+      <if test="cid != null" >
+        cId,
+      </if>
+      <if test="attitude != null" >
+        attitude,
+      </if>
+      <if test="exterior != null" >
+        exterior,
+      </if>
+      <if test="trim != null" >
+        trim,
+      </if>
+      <if test="space != null" >
+        space,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="eid != null" >
+        #{eid,jdbcType=INTEGER},
+      </if>
+      <if test="cusid != null" >
+        #{cusid,jdbcType=INTEGER},
+      </if>
+      <if test="cid != null" >
+        #{cid,jdbcType=INTEGER},
+      </if>
+      <if test="attitude != null" >
+        #{attitude,jdbcType=INTEGER},
+      </if>
+      <if test="exterior != null" >
+        #{exterior,jdbcType=INTEGER},
+      </if>
+      <if test="trim != null" >
+        #{trim,jdbcType=INTEGER},
+      </if>
+      <if test="space != null" >
+        #{space,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="update" parameterType="Evaluate" >
+    update t_evaluate
+    <set >
+      <if test="attitude != null" >
+        attitude = #{attitude,jdbcType=INTEGER},
+      </if>
+      <if test="exterior != null" >
+        exterior = #{exterior,jdbcType=INTEGER},
+      </if>
+      <if test="trim != null" >
+        trim = #{trim,jdbcType=INTEGER},
+      </if>
+      <if test="space != null" >
+        space = #{space,jdbcType=INTEGER},
+      </if>
+    </set>
+    where eid = #{eid,jdbcType=INTEGER}
+  </update>
+
+    <sql id="basesql">
+        select ifnull(tb.score,0) score,car.cId,car.cname,car.pubtime from
+        (select cId,(ifnull(attitude,0)+ifnull(exterior,0)+ifnull(trim,0)+ifnull(space,0))/4 score from t_evaluate where cusId=#{cusId}) tb
+        right join
+        (SELECT cId,cname,pubtime FROM t_car WHERE 1=1
+        <if test="cname != null" >
+            AND cname LIKE #{cname,jdbcType=VARCHAR}
+        </if>
+        ) car
+        on car.cid=tb.cId
+    </sql>
+
+    <select id="selectTotalRows" resultType="java.lang.Integer">
+        SELECT count(*) FROM (<include refid="basesql"/>) testTb
+    </select>
+
+    <select id="selectBycusId" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT * FROM (<include refid="basesql"/>) testTb LIMIT  #{offset},#{limit}
+    </select>
+
+  <!--<select id="selectBycusId" resultType="java.util.Map">
+    select ifnull(tb.score,0) score,car.cId,car.cname,car.pubtime from
+      (select cId,(ifnull(attitude,0)+ifnull(exterior,0)+ifnull(trim,0)+ifnull(space,0))/4 score from t_evaluate where cusId=#{cusId}) tb
+    right join t_car car on car.cid=tb.cId;
+  </select>-->
+
+  <select id="selectStarBycusId" resultType="java.util.Map">
+    select eid,attitude,exterior,trim,space from t_evaluate where cusId=#{0} and cId=#{1};
+  </select>
+
+</mapper>

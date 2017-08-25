@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>test</title>
+    <script charset="UTF-8" src="static/js/jquery.js"></script>
+</head>
+<body>
+
+    <select id="pro"></select>
+    <select id="city"></select>
+    <select id="area"></select>
+
+    <script>
+        var proIndex;
+        var proName;
+        var cityIndex;
+        var cityName;
+
+        $.getJSON('static/json/address.json',function (data) {
+            var proSelect = $("#pro");
+            $.each(data,function (infoIndex,info) {
+                console.log(infoIndex+"   "+info.name);
+                proSelect.append("<option value='"+infoIndex+"'>"+info.name+"</option>")
+            })
+        });
+
+        $("#pro").change(function () {
+            $("#city").empty();
+            $("#area").empty();
+            proIndex = $(this).val();
+            proName = $(this).html();
+            $.getJSON('static/json/address.json',function (data) {
+                var citys = data[proIndex].sub;
+                $.each(citys,function (subIndex,sub) {
+                    $("#city").append("<option value='"+subIndex+"'>"+sub.name+"</option>")
+                })
+            });
+        })
+
+        $("#city").change(function () {
+            $("#area").empty();
+            cityIndex = $(this).val();
+            cityName = $(this).html();
+            $.getJSON('static/json/address.json',function (data) {
+                var areas = data[proIndex].sub[cityIndex].sub;
+                $.each(areas,function (subIndex,sub) {
+                    $("#area").append("<option value='"+subIndex+"'>"+sub.name+"</option>")
+                })
+            });
+        })
+
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hxj.dao.CustomerMapper" >
+
+  <sql id="Base_Column_List" >
+    cusId, cusName, cusLoginName ,cusLoginPass, cusGender, cusAge, cusProvince, cusArea, cusPhone
+  </sql>
+
+  <sql id="basesql">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM
+      t_customer
+    WHERE 1=1
+    <if test="conditions.cname != null" >
+      AND cusName LIKE #{conditions.cname}
+    </if>
+    ORDER BY cusId DESC
+  </sql>
+
+  <insert id="insert" parameterType="Customer" >
+    insert into t_customer
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="cusid != null" >
+        cusId,
+      </if>
+      <if test="cusname != null" >
+        cusName,
+      </if>
+      <if test="cusname != null" >
+        cusLoginName,
+      </if>
+      <if test="cusname != null" >
+        cusLoginPass,
+      </if>
+      <if test="cusgender != null" >
+        cusGender,
+      </if>
+      <if test="cusage != null" >
+        cusAge,
+      </if>
+      <if test="cusprovince != null" >
+        cusProvince,
+      </if>
+      <if test="cusarea != null" >
+        cusArea,
+      </if>
+      <if test="cusphone != null" >
+        cusPhone,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="cusid != null" >
+        #{cusid,jdbcType=INTEGER},
+      </if>
+      <if test="cusname != null" >
+        #{cusname,jdbcType=VARCHAR},
+      </if>
+      <if test="cusLoginName != null" >
+        #{cusLoginName,jdbcType=VARCHAR},
+      </if>
+      <if test="cusLoginPass != null" >
+        #{cusLoginPass,jdbcType=VARCHAR},
+      </if>
+      <if test="cusgender != null" >
+        #{cusgender,jdbcType=INTEGER},
+      </if>
+      <if test="cusage != null" >
+        #{cusage,jdbcType=INTEGER},
+      </if>
+      <if test="cusprovince != null" >
+        #{cusprovince,jdbcType=VARCHAR},
+      </if>
+      <if test="cusarea != null" >
+        #{cusarea,jdbcType=VARCHAR},
+      </if>
+      <if test="cusphone != null" >
+        #{cusphone,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="update" parameterType="Customer" >
+    update t_customer
+    <set >
+      <if test="cusname != null" >
+        cusName = #{cusname,jdbcType=VARCHAR},
+      </if>
+      <if test="cusLoginName != null" >
+        cusLoginName = #{cusLoginName,jdbcType=VARCHAR},
+      </if>
+      <if test="cusLoginPass != null" >
+        cusLoginPass = #{cusLoginPass,jdbcType=VARCHAR},
+      </if>
+      <if test="cusgender != null" >
+        cusGender = #{cusgender,jdbcType=INTEGER},
+      </if>
+      <if test="cusage != null" >
+        cusAge = #{cusage,jdbcType=INTEGER},
+      </if>
+      <if test="cusprovince != null" >
+        cusProvince = #{cusprovince,jdbcType=VARCHAR},
+      </if>
+      <if test="cusarea != null" >
+        cusArea = #{cusarea,jdbcType=VARCHAR},
+      </if>
+      <if test="cusphone != null" >
+        cusPhone = #{cusphone,jdbcType=CHAR},
+      </if>
+    </set>
+    where cusId = #{cusid,jdbcType=INTEGER}
+  </update>
+
+  <delete id="delete" parameterType="java.lang.Integer" >
+    delete from t_customer
+    where cusId = #{cusid,jdbcType=INTEGER}
+  </delete>
+
+  <delete id="deleteList">
+    DELETE FROM t_customer WHERE cusId IN
+    <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </delete>
+
+  <select id="selectById" resultType="Customer" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_customer
+    where cusId = #{cusid,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectTotalRows" resultType="java.lang.Integer">
+    SELECT count(*) FROM
+    (<include refid="basesql"/>) tb
+  </select>
+
+  <select id="selectPageList" resultType="Customer">
+    SELECT * FROM
+    (<include refid="basesql"/>) tb
+    LIMIT #{start},#{pageCount}
+  </select>
+
+  <select id="selectMaxId" resultType="java.lang.Integer">
+    SELECT MAX(cusId) FROM t_customer
+  </select>
+
+  <select id="countProvince" resultType="java.util.Map">
+    select
+      SUM(CASE WHEN cusProvince='陕西省' THEN 1 ELSE 0 END) AS '陕西省',
+      SUM(CASE WHEN cusProvince='河南省' THEN 1 ELSE 0 END) AS '河南省',
+      SUM(CASE WHEN cusProvince='安徽省' THEN 1 ELSE 0 END) AS '安徽省',
+      SUM(CASE WHEN cusProvince='山西省' THEN 1 ELSE 0 END) AS '山西省',
+      SUM(CASE WHEN cusProvince='青海省' THEN 1 ELSE 0 END) AS '青海省',
+      SUM(CASE WHEN cusProvince='内蒙古省' THEN 1 ELSE 0 END) AS '内蒙古省',
+      SUM(CASE WHEN cusProvince='甘肃省' THEN 1 ELSE 0 END) AS '甘肃省',
+      SUM(CASE WHEN cusProvince='四川省' THEN 1 ELSE 0 END) AS '四川省',
+      SUM(CASE WHEN cusProvince='重庆省' THEN 1 ELSE 0 END) AS '重庆省',
+      SUM(CASE WHEN cusProvince='山东省' THEN 1 ELSE 0 END) AS '山东省',
+      SUM(CASE WHEN cusProvince='云南省' THEN 1 ELSE 0 END) AS '云南省',
+      SUM(CASE WHEN cusProvince NOT IN ('陕西省','河南省','安徽省','山西省','青海省','内蒙古省','甘肃省','四川省','重庆省','山东省','云南省') THEN 1 ELSE 0 END) AS '其他'
+    from t_customer;
+  </select>
+
+  <select id="countAge" resultType="java.util.Map">
+      select
+      SUM(CASE WHEN cusAge>=18 AND cusAge&lt;=30 THEN 1 ELSE 0 END) AS '18～30',
+      SUM(CASE WHEN cusAge>=31 AND cusAge&lt;=40 THEN 1 ELSE 0 END) AS '31～40',
+      SUM(CASE WHEN cusAge>=41 AND cusAge&lt;=50 THEN 1 ELSE 0 END) AS '41～50',
+      SUM(CASE WHEN cusAge>=51 AND cusAge&lt;=60 THEN 1 ELSE 0 END) AS '51～60',
+      SUM(CASE WHEN cusAge>=61 AND cusAge&lt;=70 THEN 1 ELSE 0 END) AS '61～70',
+      SUM(CASE WHEN cusAge&lt;18 OR cusAge>70 THEN 1 ELSE 0 END) AS '其他'
+      from t_customer;
+  </select>
+
+  <select id="countGender" resultType="java.lang.Integer">
+      SELECT
+          count(*)
+      FROM t_customer GROUP BY cusGender;
+  </select>
+
+  <insert id="insertList">
+    INSERT INTO t_customer(cusName, cusLoginName,cusLoginPass, cusGender, cusAge, cusProvince, cusArea, cusPhone)
+    VALUES
+    <foreach collection="list" index="index" item="item" separator=",">
+      (#{item.cusname},#{item.cusLoginName},#{item.cusLoginPass},#{item.cusgender},#{item.cusage},#{item.cusprovince},#{item.cusarea},#{item.cusphone})
+    </foreach>
+  </insert>
+
+  <select id="checkName" parameterType="Customer" resultType="java.lang.Integer">
+        SELECT cusid FROM t_customer WHERE cusLoginName=#{cusLoginName}
+  </select>
+
+  <select id="login" parameterType="Customer" resultType="java.lang.Integer">
+        SELECT cusid FROM t_customer WHERE cusLoginName=#{cusLoginName} AND cusLoginPass=#{cusLoginPass}
+  </select>
+
+</mapper>

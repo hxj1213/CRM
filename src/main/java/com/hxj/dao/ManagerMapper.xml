@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hxj.dao.ManagerMapper">
+
+    <select id="checkName" parameterType="Manager">
+        SELECT mid FROM t_manager WHERE mloginName=#{mloginName}
+    </select>
+
+    <insert id="insert" parameterType="Manager">
+        INSERT INTO t_manager(mloginName,mloginPass)
+        VALUES(#{mloginName},#{mloginPass})
+    </insert>
+
+    <select id="login" parameterType="Manager" resultType="java.lang.Integer">
+        SELECT mid FROM t_manager WHERE mloginName=#{mloginName} AND mloginPass=#{mloginPass}
+    </select>
+
+</mapper>

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hxj.dao.CarMapper">
+
+    <sql id="base_column">
+        cId, cName, pubTime
+    </sql>
+
+    <sql id="blob_column">
+        cInfo
+    </sql>
+
+    <sql id="basesql">
+        SELECT
+        <include refid="base_column"/>
+        ,
+        <include refid="blob_column" />
+        FROM
+        t_car
+        WHERE 1=1
+        <if test="conditions.cname != null" >
+         AND  cName LIKE #{conditions.cname}
+        </if>
+        ORDER BY cId DESC
+    </sql>
+
+    <!-- 添加汽车品牌信息 -->
+    <insert id="insert" parameterType="Car" >
+        insert into t_car
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="cid != null" >
+                cId,
+            </if>
+            <if test="cname != null" >
+                cName,
+            </if>
+            <if test="pubtime != null" >
+                pubTime,
+            </if>
+            <if test="cinfo != null" >
+                cInfo,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="cid != null" >
+                #{cid,jdbcType=INTEGER},
+            </if>
+            <if test="cname != null" >
+                #{cname,jdbcType=VARCHAR},
+            </if>
+            <if test="pubtime != null" >
+                #{pubtime,jdbcType=DATE},
+            </if>
+            <if test="cinfo != null" >
+                #{cinfo,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <!-- 修改汽车品牌信息 -->
+    <update id="update" parameterType="Car" >
+        update t_car
+        <set >
+            <if test="cname != null" >
+                cName = #{cname,jdbcType=VARCHAR},
+            </if>
+            <if test="pubtime != null" >
+                pubTime = #{pubtime,jdbcType=DATE},
+            </if>
+            <if test="cinfo != null" >
+                cInfo = #{cinfo,jdbcType=LONGVARCHAR},
+            </if>
+        </set>
+        where cId = #{cid,jdbcType=INTEGER}
+    </update>
+
+    <delete id="delete" parameterType="java.lang.Integer" >
+        DELETE FROM t_car
+        WHERE cId = #{cid,jdbcType=INTEGER}
+    </delete>
+
+    <delete id="deleteList">
+        DELETE FROM t_car WHERE cId IN
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="selectById" resultType="Car" parameterType="java.lang.Integer" >
+        select
+        <include refid="base_column" />
+        ,
+        <include refid="blob_column" />
+        from t_car
+        where cId = #{cid,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectTotalRows" resultType="java.lang.Integer">
+        SELECT count(*) FROM
+        (<include refid="basesql"/>) tb
+    </select>
+
+    <select id="selectPageList" resultType="Car">
+        SELECT * FROM
+        (<include refid="basesql"/>) tb
+        LIMIT #{start},#{pageCount}
+    </select>
+
+    <select id="selectMaxId" resultType="java.lang.Integer">
+        SELECT MAX(cId) FROM t_car
+    </select>
+
+    <insert id="insertList">
+        INSERT INTO t_car(cName,cInfo,pubTime)
+        VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (#{item.cname},#{item.cinfo},#{item.pubtime})
+        </foreach>
+    </insert>
+
+    <select id="countCarByAll" resultType="java.util.Map">
+        select cb.cId,cb.cName,
+            avg(eb.attitude) attitude,avg(eb.exterior) exterior,avg(eb.trim) trim,avg(eb.space) space
+        from t_car cb
+            left join t_evaluate eb on cb.cId=eb.cId group by cb.cId
+    </select>
+
+    <select id="countCarByAttitude" resultType="java.util.Map">
+        select cb.cName,avg(eb.attitude) attitude
+        from t_car cb left join t_evaluate eb on cb.cId=eb.cId group by cb.cId order by attitude desc
+    </select>
+
+    <select id="countCarByExterior" resultType="java.util.Map">
+        select cb.cName,avg(eb.exterior) exterior
+        from t_car cb left join t_evaluate eb on cb.cId=eb.cId group by cb.cId order by exterior desc
+    </select>
+
+    <select id="countCarByTrim" resultType="java.util.Map">
+        select cb.cName,avg(eb.trim) trim
+        from t_car cb left join t_evaluate eb on cb.cId=eb.cId group by cb.cId order by trim desc
+    </select>
+
+    <select id="countCarBySpace" resultType="java.util.Map">
+        select cb.cName,avg(eb.space) space
+        from t_car cb left join t_evaluate eb on cb.cId=eb.cId group by cb.cId order by space desc
+    </select>
+
+    <!--
+    select cb.cId,cb.cName,avg(eb.attitude) attitude
+     from t_car cb left join t_evaluate eb on cb.cId=eb.cId group by cb.cId order by attitude desc
+    avg((eb.attitude+eb.exterior+eb.trim+eb.space)/4) sumavg
+
+    avg(eb.exterior) exterior,avg(eb.trim) trim,avg(eb.space) space
+    -->
+
+</mapper>

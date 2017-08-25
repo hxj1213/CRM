@@ -1,0 +1,15 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: hxj
+  Date: 17-8-18
+  Time: 下午3:00
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="false" pageEncoding="UTF-8" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<c:set value="${pageContext.request.contextPath}" var="path"/>
+<link rel="stylesheet" href="${path}/bootstrapvalidator/vendor/bootstrap/css/bootstrap.css"/>
+<link rel="stylesheet" href="${path}/bootstrapvalidator/dist/css/bootstrapValidator.css"/>
+<script msgType="text/javascript" src="${path}/bootstrapvalidator/vendor/jquery/jquery-1.10.2.min.js"></script>
+<script msgType="text/javascript" src="${path}/bootstrapvalidator/vendor/bootstrap/js/bootstrap.min.js"></script>
+<script msgType="text/javascript" src="${path}/bootstrapvalidator/dist/js/bootstrapValidator.js"></script>
